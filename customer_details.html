@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل العميل</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .details {
+            margin-bottom: 15px;
+        }
+        .details label {
+            font-weight: bold;
+        }
+        .actions button {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actions .pay-button {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تفاصيل العميل</h1>
+        <div class="details">
+            <p><label>الاسم:</label> <span id="customerName"></span></p>
+            <p><label>رقم الهاتف:</label> <span id="customerPhone"></span></p>
+            <p><label>البريد الإلكتروني:</label> <span id="customerEmail"></span></p>
+            <p><label>الدين المستحق:</label> <span id="customerDebt">0</span> جنيه</p>
+        </div>
+        <div class="actions">
+            <button class="pay-button" onclick="payDebt()">تسديد الدين</button>
+            <button onclick="window.location.href='customers.html'">⬅️ الرجوع</button>
+            <button class="sell-to-customer-button" onclick="sellToCustomer()">بيع للعميل</button>
+        </div>
+    </div>
+    <script>
+        const customers = JSON.parse(localStorage.getItem("customers")) || [];
+        const index = localStorage.getItem("currentCustomerIndex");
+        const customer = customers[index];
+
+        // عرض تفاصيل العميل
+        document.getElementById("customerName").textContent = customer.name;
+        document.getElementById("customerPhone").textContent = customer.phone;
+        document.getElementById("customerEmail").textContent = customer.email;
+        document.getElementById("customerDebt").textContent = customer.debt || 0;
+
+        // تسديد الدين
+        function payDebt() {
+            const currentDebt = customer.debt || 0;
+
+            // التحقق من وجود دين
+            if (currentDebt <= 0) {
+                alert("لا يوجد دين مستحق للتسديد.");
+                return;
+            }
+
+            const amount = parseFloat(prompt("أدخل المبلغ المسدد:"));
+
+            // التحقق من المدخلات
+            if (isNaN(amount) || amount <= 0) {
+                alert("يرجى إدخال مبلغ صالح.");
+                return;
+            }
+
+            if (amount > currentDebt) {
+                alert("فشل في التسديد: المبلغ المدخل أكبر من الدين المستحق.");
+                return;
+            }
+
+            // تقليل الدين
+            customer.debt = Math.max(0, currentDebt - amount);
+            localStorage.setItem("customers", JSON.stringify(customers));
+            document.getElementById("customerDebt").textContent = customer.debt;
+            alert("تم تسديد الدين بنجاح.");
+        }
+
+        // بيع للعميل
+        function sellToCustomer() {
+            localStorage.setItem("currentCustomerIndex", index); // تخزين فهرس العميل الحالي
+            window.location.href = 'sell_to_customer.html'; // الانتقال إلى صفحة بيع للعميل
+        }
+    </script>
+</body>
+</html>

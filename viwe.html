@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض المنتجات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h3 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        #productCategoriesContainer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>عرض المنتجات حسب التصنيف</h1>
+    <button onclick="displayProductsByCategory()">عرض المنتجات</button>
+    <div id="productCategoriesContainer"></div>
+
+    <script>
+        function displayProductsByCategory() {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+
+            if (products.length === 0) {
+                alert("لا توجد منتجات في المخزن.");
+                return;
+            }
+
+            // إنشاء مجموعات حسب التصنيف
+            const categorizedProducts = products.reduce((categories, product) => {
+                if (!categories[product.category]) {
+                    categories[product.category] = [];
+                }
+                categories[product.category].push(product);
+                return categories;
+            }, {});
+
+            // تحديد العنصر الذي سيتم عرض البيانات فيه
+            const container = document.getElementById("productCategoriesContainer");
+            container.innerHTML = ""; // مسح أي بيانات سابقة
+
+            Object.keys(categorizedProducts).forEach(category => {
+                const categoryHeader = document.createElement("h3");
+                categoryHeader.textContent = `تصنيف: ${category}`;
+                categoryHeader.style.marginBottom = "10px";
+
+                const productList = document.createElement("ul");
+                productList.style.listStyle = "none";
+                productList.style.padding = "0";
+
+                categorizedProducts[category].forEach(product => {
+                    const productItem = document.createElement("li");
+                    productItem.textContent = `اسم المنتج: ${product.name}, الكمية: ${product.quantity}, سعر الشراء: ${product.cost}, سعر البيع: ${product.price}`;
+                    productItem.style.marginBottom = "5px";
+                    productList.appendChild(productItem);
+                });
+
+                container.appendChild(categoryHeader);
+                container.appendChild(productList);
+            });
+        }
+    </script>
+</body>
+</html>

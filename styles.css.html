@@ -1,0 +1,217 @@
+/* الأساسيات */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-size: 14px;
+    color: #333;
+}
+
+h1, h2, h3 {
+    color: #333;
+    font-weight: normal;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+ul {
+    list-style: none;
+}
+
+/* الحاوية الرئيسية للتطبيق */
+.app-container {
+    display: flex;
+}
+
+/* الشريط الجانبي */
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    padding: 20px;
+    color: white;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.sidebar nav ul {
+    padding-left: 0;
+}
+
+.sidebar nav ul li {
+    margin: 15px 0;
+}
+
+.sidebar nav ul li a {
+    display: block;
+    padding: 10px;
+    color: #ffffff;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar nav ul li a:hover {
+    background-color: #495057;
+}
+
+/* محتوى الصفحة */
+.main-content {
+    width: 100%;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.main-content h1 {
+    margin-bottom: 20px;
+    font-size: 30px;
+    color: #495057;
+}
+
+/* الحاويات الرئيسية للبيانات */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.stat-card p {
+    font-size: 18px;
+    color: #007bff;
+}
+
+.stat-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stat-card table th,
+.stat-card table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.stat-card table th {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.stat-card table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* تعديل لكل صف فرعي في التنقل */
+.sidebar nav ul li a.active {
+    background-color: #007bff;
+}
+
+/* لصفحة "شراء المنتجات" و "بيع المنتجات" */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.product-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.product-table td {
+    font-size: 16px;
+}
+
+.add-product-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-product-btn:hover {
+    background-color: #218838;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* لتنسيق الجداول في صفحات الإدارة */
+.table-container {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th,
+table td {
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #343a40;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}

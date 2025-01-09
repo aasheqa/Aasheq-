@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الخزينة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .details {
+            margin-bottom: 15px;
+        }
+        .details label {
+            font-weight: bold;
+        }
+        .actions button {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actions .add-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .actions .deduct-button {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>الخزينة</h1>
+        <div class="details">
+            <p><label>الرصيد الحالي:</label> <span id="cashBalance">0</span> جنيه</p>
+        </div>
+        <div class="actions">
+            <button class="add-button" onclick="addCash()">إضافة مبلغ</button>
+            <button class="deduct-button" onclick="deductCash()">خصم مبلغ</button>
+        </div>
+        <div class="actions">
+            <button onclick="window.location.href='/storage/emulated/0/my_store/index.html'">⬅️ الرجوع</button>
+        </div>
+    </div>
+    <script>
+        // التحقق من وجود رصيد مخزن في الخزينة
+        if (!localStorage.getItem("cashBalance")) {
+            localStorage.setItem("cashBalance", "0"); // تعيين الرصيد الافتراضي إلى 0
+        }
+
+        // جلب الرصيد الحالي وعرضه
+        function updateCashBalanceDisplay() {
+            const balance = parseFloat(localStorage.getItem("cashBalance")) || 0;
+            document.getElementById("cashBalance").textContent = balance.toFixed(2); // عرض الرصيد بحد أقصى رقمين عشريين
+        }
+
+        updateCashBalanceDisplay();
+
+        // إضافة مبلغ إلى الخزينة
+        function addCash() {
+            const amount = parseFloat(prompt("أدخل المبلغ المراد إضافته:"));
+            if (isNaN(amount) || amount <= 0) {
+                alert("يرجى إدخال مبلغ صالح.");
+                return;
+            }
+            let currentBalance = parseFloat(localStorage.getItem("cashBalance")) || 0;
+            currentBalance += amount;
+            localStorage.setItem("cashBalance", currentBalance.toFixed(2));
+            updateCashBalanceDisplay();
+            alert("تمت إضافة المبلغ بنجاح.");
+        }
+
+        // خصم مبلغ من الخزينة
+        function deductCash() {
+            const amount = parseFloat(prompt("أدخل المبلغ المراد خصمه:"));
+            if (isNaN(amount) || amount <= 0) {
+                alert("يرجى إدخال مبلغ صالح.");
+                return;
+            }
+            let currentBalance = parseFloat(localStorage.getItem("cashBalance")) || 0;
+            if (amount > currentBalance) {
+                alert("فشل في الخصم: المبلغ المراد خصمه أكبر من الرصيد الحالي.");
+                return;
+            }
+            currentBalance -= amount;
+            localStorage.setItem("cashBalance", currentBalance.toFixed(2));
+            updateCashBalanceDisplay();
+            alert("تم خصم المبلغ بنجاح.");
+        }
+    </script>
+</body>
+</html>

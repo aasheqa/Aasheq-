@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شراء المنتجات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+            background-color: #f4f4f9;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+/* زر العودة إلى الصفحة الرئيسية */
+   .back-button {
+       position: fixed;
+       top: 0px;
+       left:0px;
+       width:40px;
+       height:30px;
+       background-color: silver;
+       color: white;
+       border: none;
+       font-size: 20px;
+       border-radius: 2px;
+       cursor: pointer;
+   }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .scanner-button {
+            background-color: #28a745;
+        }
+
+        .scanner-button:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<button class="back-button" onclick="window.location.href='index.html'">⬅ </button>
+
+    <div class="main-content">
+        <h1>شراء المنتجات</h1>
+        
+        <div class="form-group">
+            <label for="productName">اسم المنتج أو الباركود:</label>
+            <input type="text" id="productInput" placeholder="أدخل اسم المنتج أو امسح الباركود">
+            <button class="scanner-button" onclick="scanBarcode()">مسح الباركود باستخدام الكاميرا</button>
+        </div>
+
+        <div id="productForm" class="hidden">
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="productName" placeholder="اسم المنتج">
+            </div>
+
+            <div class="form-group">
+                <label>سعر الشراء:</label>
+                <input type="number" id="productCost" placeholder="سعر الشراء">
+            </div>
+
+            <div class="form-group">
+                <label>سعر البيع:</label>
+                <input type="number" id="productPrice" placeholder="سعر البيع">
+            </div>
+
+            <div class="form-group">
+                <label>الكمية:</label>
+                <input type="number" id="productQuantity" placeholder="الكمية">
+            </div>
+
+            <div class="form-group">
+                <label>التصنيف:</label>
+                <select id="productCategory">
+                    <option value="مشروبات">مشروبات</option>
+                    <option value="عصائر">عصائر</option>
+                    <option value="مأكولات">مأكولات</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button onclick="updateProduct()">تحديث البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+    <script>
+        // التحقق من وجود المخزن
+        if (!localStorage.getItem('products')) {
+            localStorage.setItem('products', JSON.stringify([]));
+        }
+
+        const productForm = document.getElementById("productForm");
+
+        function scanBarcode() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.createElement("video");
+                    video.srcObject = stream;
+                    video.play();
+
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+
+                    video.addEventListener('play', () => {
+                        const interval = setInterval(() => {
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, canvas.width, canvas.height);
+                            if (code) {
+                                alert("تم مسح الباركود: " + code.data);
+                                document.getElementById("productInput").value = code.data;
+                                loadProductData(code.data);
+                                stream.getTracks().forEach(track => track.stop());
+                                clearInterval(interval);
+                            }
+                        }, 500);
+                    });
+                })
+                .catch(err => alert("تعذر الوصول إلى الكاميرا: " + err));
+        }
+
+        function loadProductData(input) {
+            const products = JSON.parse(localStorage.getItem('products'));
+            const product = products.find(p => p.barcode === input || p.name === input);
+
+            if (product) {
+                // إذا كان المنتج موجودًا، املأ الحقول
+                productForm.classList.remove("hidden");
+                document.getElementById("productName").value = product.name;
+                document.getElementById("productCost").value = product.cost;
+                document.getElementById("productPrice").value = product.price;
+                document.getElementById("productQuantity").value = product.quantity;
+                document.getElementById("productCategory").value = product.category;
+            } else {
+                alert("المنتج غير موجود. يرجى إدخاله يدويًا.");
+                productForm.classList.remove("hidden");
+                document.getElementById("productName").value = input;
+            }
+        }
+
+        function updateProduct() {
+            const name = document.getElementById("productName").value;
+            const cost = document.getElementById("productCost").value;
+            const price = document.getElementById("productPrice").value;
+            const quantity = document.getElementById("productQuantity").value;
+            const category = document.getElementById("productCategory").value;
+
+            if (!name || !cost || !price || !quantity || !category) {
+                alert("يرجى ملء جميع الحقول.");
+                return;
+            }
+
+            const products = JSON.parse(localStorage.getItem('products'));
+            const barcode = document.getElementById("productInput").value;
+            const existingProduct = products.find(p => p.barcode === barcode || p.name === name);
+
+            if (existingProduct) {
+                // تحديث بيانات المنتج الموجود
+                existingProduct.name = name;
+                existingProduct.cost = parseFloat(cost);
+                existingProduct.price = parseFloat(price);
+                existingProduct.quantity = parseInt(quantity);
+                existingProduct.category = category;
+            } else {
+                // إضافة منتج جديد
+                products.push({
+                    name: name,
+                    cost: parseFloat(cost),
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity),
+                    category: category,
+                    barcode: barcode
+                });
+            }
+
+            localStorage.setItem('products', JSON.stringify(products));
+            alert("تم تحديث البيانات بنجاح!");
+            productForm.classList.add("hidden");
+            document.getElementById("productInput").value = '';
+        }
+    </script>
+</body>
+</html>

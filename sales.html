@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيع المنتجات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            width: 50%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* زر العودة إلى الصفحة الرئيسية */
+        .back-button {
+            position: fixed;
+            top: 0px;
+            left:0px;
+            width:40px;
+            height:30px;
+            background-color: silver;
+            color: white;
+            border: none;
+            font-size: 20px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .scanner-button {
+            background-color: #28a745;
+        }
+
+        .scanner-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">⬅ </button>
+
+    <div class="main-content">
+        <h1>بيع المنتجات</h1>
+
+        <div class="form-group">
+            <label for="saleBarcode">الباركود:</label>
+            <input type="text" id="saleBarcode" placeholder="أدخل باركود المنتج">
+            <button class="scanner-button" onclick="scanBarcode()">مسح الباركود باستخدام الكاميرا</button>
+        </div>
+
+        <div class="form-group">
+            <label for="saleQuantity">الكمية المباعة:</label>
+            <input type="number" id="saleQuantity" placeholder="أدخل الكمية المباعة">
+        </div>
+
+        <div class="form-group">
+            <button onclick="sellProduct()">بيع المنتج</button>
+        </div>
+
+        
+            <tbody id="saleProductTable">
+                <!-- سيتم عرض المنتجات المباعة هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+    <script>
+        if (!localStorage.getItem('products')) {
+            const initialProducts = [];
+            localStorage.setItem('products', JSON.stringify(initialProducts));
+        }
+
+        let totalAmount = 0;
+
+        function sellProduct() {
+            const barcode = document.getElementById("saleBarcode").value;
+            const quantity = document.getElementById("saleQuantity").value;
+
+            if (!barcode || !quantity) {
+                alert("من فضلك أكمل جميع الحقول.");
+                return;
+            }
+
+            const productsList = JSON.parse(localStorage.getItem('products'));
+            const product = productsList.find(product => product.barcode === barcode);
+
+            if (!product) {
+                alert("المنتج غير موجود.");
+                return;
+            }
+
+            if (product.quantity < quantity) {
+                alert("الكمية المتاحة غير كافية.");
+                return;
+            }
+
+            // تقليص الكمية في المخزن
+            product.quantity -= quantity;
+
+            // حساب إجمالي السعر
+            const totalPrice = product.price * quantity;
+            totalAmount += totalPrice;
+
+            // إضافة السجل إلى جدول المنتجات المباعة
+            const saleRecord = {
+                name: product.name,
+                price: product.price,
+                cost: product.cost,
+                soldQuantity: quantity,
+                category: product.category,
+                total: totalPrice
+            };
+
+            const saleTable = document.getElementById("saleProductTable");
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${saleRecord.name}</td>
+                <td>${saleRecord.price}</td>
+                <td>${saleRecord.cost}</td>
+                <td>${product.quantity}</td>
+                <td>${saleRecord.soldQuantity}</td>
+                <td>${saleRecord.category}</td>
+                <td>${saleRecord.total}</td>
+            `;
+            saleTable.appendChild(row);
+
+            // تحديث البيانات في المخزن المحلي
+            localStorage.setItem('products', JSON.stringify(productsList));
+
+            // عرض إجمالي المبيعات
+            alert("إجمالي المبيعات حتى الآن: " + totalAmount);
+
+            // إعادة تعيين الحقول
+            document.getElementById("saleBarcode").value = '';
+            document.getElementById("saleQuantity").value = '';
+        }
+
+        function scanBarcode() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    const video = document.createElement("video");
+                    video.srcObject = stream;
+                    video.play();
+
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+
+                    video.addEventListener('play', function () {
+                        setInterval(function () {
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, canvas.width, canvas.height);
+                            if (code) {
+                                alert("تم مسح الباركود: " + code.data);
+                                document.getElementById("saleBarcode").value = code.data;
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                        }, 100);
+                    });
+                })
+                .catch(function (error) {
+                    alert("تعذر الوصول إلى الكاميرا: " + error);
+                });
+        }
+    </script>
+</body>
+</html>

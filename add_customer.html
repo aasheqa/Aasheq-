@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة عميل جديد</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+        }
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>إضافة عميل جديد</h1>
+        <div class="form-group">
+            <label for="customerName">اسم العميل:</label>
+            <input type="text" id="customerName" placeholder="أدخل اسم العميل">
+        </div>
+        <div class="form-group">
+            <label for="customerPhone">رقم الهاتف:</label>
+            <input type="text" id="customerPhone" placeholder="أدخل رقم الهاتف">
+        </div>
+        <div class="form-group">
+            <label for="customerEmail">البريد الإلكتروني:</label>
+            <input type="email" id="customerEmail" placeholder="أدخل البريد الإلكتروني">
+        </div>
+        <div class="form-group">
+            <button onclick="addCustomer()">إضافة العميل</button>
+        </div>
+    </div>
+    <script>
+        function addCustomer() {
+            const name = document.getElementById("customerName").value;
+            const phone = document.getElementById("customerPhone").value;
+            const email = document.getElementById("customerEmail").value;
+
+            if (!name || !phone || !email) {
+                alert("يرجى تعبئة جميع الحقول.");
+                return;
+            }
+
+            const newCustomer = { name, phone, email, debt: 0 };
+            const customers = JSON.parse(localStorage.getItem("customers")) || [];
+            customers.push(newCustomer);
+            localStorage.setItem("customers", JSON.stringify(customers));
+            alert("تمت إضافة العميل بنجاح.");
+            window.location.href = 'customers.html';
+        }
+    </script>
+</body>
+</html>

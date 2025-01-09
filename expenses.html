@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الخزينة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .form-group input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">⬅ العودة إلى القائمة الرئيسية</button>
+    
+    <div class="container">
+        <h1>إدارة الخزينة</h1>
+        
+        <!-- إضافة رأس المال -->
+        <div class="form-group">
+            <label for="capitalAmount">رأس المال:</label>
+            <input type="number" id="capitalAmount" placeholder="أدخل رأس المال" />
+            <button onclick="addCapital()">إضافة رأس المال</button>
+        </div>
+
+        <!-- إضافة الإيرادات -->
+        <div class="form-group">
+            <label for="incomeAmount">الإيرادات:</label>
+            <input type="number" id="incomeAmount" placeholder="أدخل الإيرادات" />
+            <button onclick="addIncome()">إضافة إيرادات</button>
+        </div>
+        
+        <!-- إضافة المصروفات -->
+        <div class="form-group">
+            <label for="expenseAmount">المصروفات:</label>
+            <input type="number" id="expenseAmount" placeholder="أدخل المصروفات" />
+            <button onclick="addExpense()">إضافة مصروفات</button>
+        </div>
+
+        <!-- عرض رصيد الخزينة -->
+        <h3>رصيد الخزينة: <span id="balance">0</span> ريال</h3>
+
+        <!-- التقارير -->
+        <div class="form-group">
+            <button onclick="generateReport()">توليد تقرير</button>
+        </div>
+
+        <!-- عرض التقارير -->
+        <h3>التقارير:</h3>
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>الإيرادات</th>
+                    <th>المصروفات</th>
+                    <th>الرصيد</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة التقارير هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let balance = 0;
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        // إضافة رأس المال إلى الخزينة
+        function addCapital() {
+            const capitalAmount = parseFloat(document.getElementById('capitalAmount').value);
+            if (!isNaN(capitalAmount) && capitalAmount > 0) {
+                balance += capitalAmount;
+                document.getElementById('balance').textContent = balance;
+                alert('تم إضافة رأس المال بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة لرأس المال!');
+            }
+        }
+
+        // إضافة الإيرادات إلى الخزينة
+        function addIncome() {
+            const incomeAmount = parseFloat(document.getElementById('incomeAmount').value);
+            if (!isNaN(incomeAmount) && incomeAmount > 0) {
+                totalIncome += incomeAmount;
+                balance += incomeAmount;  // إضافة الإيرادات إلى رصيد الخزينة
+                document.getElementById('balance').textContent = balance;
+                alert('تم إضافة الإيرادات بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة للإيرادات!');
+            }
+        }
+
+        // إضافة المصروفات من الخزينة
+        function addExpense() {
+            const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+            if (!isNaN(expenseAmount) && expenseAmount > 0) {
+                totalExpense += expenseAmount;
+                balance -= expenseAmount;  // خصم المصروفات من رصيد الخزينة
+                document.getElementById('balance').textContent = balance;
+                alert('تم إضافة المصروفات بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة للمصروفات!');
+            }
+        }
+
+        // توليد التقرير
+        function generateReport() {
+            const date = new Date().toLocaleDateString();
+            const reportRow = `
+                <tr>
+                    <td>${date}</td>
+                    <td>${totalIncome}</td>
+                    <td>${totalExpense}</td>
+                    <td>${balance}</td>
+                </tr>
+            `;
+            document.querySelector('#reportTable tbody').insertAdjacentHTML('beforeend', reportRow);
+        }
+    </script>
+</body>
+</html>

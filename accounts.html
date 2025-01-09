@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الحسابات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .form-group input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">⬅ العودة إلى القائمة الرئيسية</button>
+    
+    <div class="container">
+        <h1>إدارة الحسابات</h1>
+        
+        <!-- إضافة الإيرادات -->
+        <div class="form-group">
+            <label for="incomeAmount">الإيرادات:</label>
+            <input type="number" id="incomeAmount" placeholder="أدخل الإيرادات" />
+            <button onclick="addIncome()">إضافة إيرادات</button>
+        </div>
+        
+        <!-- إضافة المصروفات -->
+        <div class="form-group">
+            <label for="expenseAmount">المصروفات:</label>
+            <input type="number" id="expenseAmount" placeholder="أدخل المصروفات" />
+            <button onclick="addExpense()">إضافة مصروفات</button>
+        </div>
+
+        <!-- إضافة الضرائب -->
+        <div class="form-group">
+            <label for="taxAmount">الضرائب:</label>
+            <input type="number" id="taxAmount" placeholder="أدخل الضرائب" />
+            <button onclick="addTax()">إضافة ضرائب</button>
+        </div>
+
+        <!-- عرض الأرباح -->
+        <h3>إجمالي الإيرادات: <span id="totalIncome">0</span></h3>
+        <h3>إجمالي المصروفات: <span id="totalExpense">0</span></h3>
+        <h3>الأرباح: <span id="totalProfit">0</span></h3>
+
+        <!-- توليد التقارير -->
+        <div class="form-group">
+            <button onclick="generateReport()">توليد تقرير</button>
+        </div>
+
+        <!-- اختيار نوع التقرير -->
+        <div class="form-group">
+            <label for="reportType">اختر نوع التقرير:</label>
+            <select id="reportType" onchange="generateReport()">
+                <option value="daily">التقارير اليومية</option>
+                <option value="monthly">التقارير الشهرية</option>
+            </select>
+        </div>
+
+        <!-- عرض التقارير -->
+        <h3>التقارير:</h3>
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>التاريخ والوقت</th>
+                    <th>الإيرادات</th>
+                    <th>المصروفات</th>
+                    <th>الضرائب</th>
+                    <th>الأرباح</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة التقارير هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let totalTax = 0;
+        let reports = [];
+
+        // إضافة الإيرادات
+        function addIncome() {
+            const incomeAmount = parseFloat(document.getElementById('incomeAmount').value);
+            if (!isNaN(incomeAmount) && incomeAmount > 0) {
+                totalIncome += incomeAmount;
+                document.getElementById('totalIncome').textContent = totalIncome;
+                alert('تم إضافة الإيرادات بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة للإيرادات!');
+            }
+        }
+
+        // إضافة المصروفات
+        function addExpense() {
+            const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+            if (!isNaN(expenseAmount) && expenseAmount > 0) {
+                totalExpense += expenseAmount;
+                document.getElementById('totalExpense').textContent = totalExpense;
+                alert('تم إضافة المصروفات بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة للمصروفات!');
+            }
+        }
+
+        // إضافة الضرائب
+        function addTax() {
+            const taxAmount = parseFloat(document.getElementById('taxAmount').value);
+            if (!isNaN(taxAmount) && taxAmount > 0) {
+                totalTax += taxAmount;
+                alert('تم إضافة الضرائب بنجاح!');
+            } else {
+                alert('يرجى إدخال قيمة صحيحة للضرائب!');
+            }
+        }
+
+        // توليد التقرير
+        function generateReport() {
+            const profit = totalIncome - totalExpense - totalTax;
+            const dateTime = new Date().toLocaleString();
+
+            // إضافة التقرير إلى التقرير المتراكم
+            const report = {
+                dateTime: dateTime,
+                income: totalIncome,
+                expense: totalExpense,
+                tax: totalTax,
+                profit: profit
+            };
+            reports.push(report);
+
+            // استعراض التقارير بناءً على النوع المحدد
+            const reportType = document.getElementById('reportType').value;
+            const tableBody = document.getElementById('reportTable').querySelector('tbody');
+            tableBody.innerHTML = ''; // إعادة تحميل التقارير الجديدة
+            reports.forEach(report => {
+                if (reportType === 'daily') {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${report.dateTime}</td>
+                        <td>${report.income}</td>
+                        <td>${report.expense}</td>
+                        <td>${report.tax}</td>
+                        <td>${report.profit}</td>
+                    `;
+                } else if (reportType === 'monthly') {
+                    const reportDate = new Date(report.dateTime);
+                    const currentMonth = new Date().getMonth();
+                    if (reportDate.getMonth() === currentMonth) {
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${report.dateTime}</td>
+                            <td>${report.income}</td>
+                            <td>${report.expense}</td>
+                            <td>${report.tax}</td>
+                            <td>${report.profit}</td>
+                        `;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

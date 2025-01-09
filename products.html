@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مخزن المنتجات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+
+  /* زر العودة إلى الصفحة الرئيسية */
+     .back-button {
+         
+         position:absolute;
+         top: 0px;
+         left:0px;
+         width:40px;
+         height:30px;
+         background-color: silver;
+         color: white;
+         border: none;
+         font-size: 20px;
+         border-radius: 2px;
+         cursor: pointer;
+     }
+     
+     
+
+        .scanner-button {
+            background-color: #28a745;
+        }
+
+        .scanner-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">⬅</button>
+
+    <div class="main-content">
+        <h1>مخزن المنتجات</h1>
+
+        <div class="form-group">
+            <label for="productName">اسم المنتج:</label>
+            <input type="text" id="productName" placeholder="أدخل اسم المنتج">
+        </div>
+
+        <div class="form-group">
+            <label for="productPrice">سعر المنتج:</label>
+            <input type="number" id="productPrice" placeholder="أدخل سعر المنتج">
+        </div>
+
+        <div class="form-group">
+            <label for="productCost">تكلفة المنتج:</label>
+            <input type="number" id="productCost" placeholder="أدخل تكلفة المنتج">
+        </div>
+
+        <div class="form-group">
+            <label for="productQuantity">الكمية:</label>
+            <input type="number" id="productQuantity" placeholder="أدخل كمية المنتج">
+        </div>
+
+        <div class="form-group">
+            <label for="productCategory">التصنيف:</label>
+            <select id="productCategory">
+                <option value="مشروبات">مشروبات</option>
+                <option value="عصائر">عصائر</option>
+                <option value="مأكولات">مأكولات</option>
+                <option value="حلويات">حلويات</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="productBarcode">الباركود:</label>
+            <input type="text" id="productBarcode" placeholder="أدخل باركود المنتج">
+            <button class="scanner-button" onclick="scanBarcode()">مسح الباركود باستخدام الكاميرا</button>
+        </div>
+
+        <div class="form-group">
+            <label for="productImage">صورة المنتج:</label>
+            <input type="file" id="productImage">
+            <button onclick="captureImage()">التقط صورة للمنتج</button>
+        </div>
+
+        <div class="form-group">
+            <button onclick="addProduct()">إضافة المنتج</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم المنتج</th>
+                    <th>السعر</th>
+                    <th>التكلفة</th>
+                    <th>الكمية</th>
+                    
+                
+                </tr>
+                
+                
+            </thead>
+            <tbody id="productTable">
+                <!-- سيتم إضافة المنتجات هنا -->
+            </tbody>
+        </table>
+        
+        <table>
+        <thead>
+        <tr>
+        <th>الباركود</th>
+        <th>التصنيف</th>
+        <th>الصورة</th>
+        <th>إجراءات</th>
+        </tr>
+        
+        
+        </thead>
+        <tbody id="productTable">
+        <!-- سيتم إضافة المنتجات هنا -->
+        </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql.js"></script>
+    <script>
+        let db;
+
+        window.onload = () => {
+            const dbData = localStorage.getItem('db');
+            if (dbData) {
+                db = new SQL.Database(new Uint8Array(dbData));
+            } else {
+                db = new SQL.Database();
+                db.run("CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price REAL, cost REAL, quantity INTEGER, category TEXT, barcode TEXT, image TEXT);");
+            }
+
+            displayProducts();
+        };
+
+        function addProduct() {
+            const name = document.getElementById("productName").value;
+            const price = document.getElementById("productPrice").value;
+            const cost = document.getElementById("productCost").value;
+            const quantity = document.getElementById("productQuantity").value;
+            const category = document.getElementById("productCategory").value;
+            const barcode = document.getElementById("productBarcode").value;
+            const image = document.getElementById("productImage").files[0];
+
+            if (!name || !price || !cost || !quantity || !barcode) {
+                alert("من فضلك أكمل جميع الحقول المطلوبة.");
+                return;
+            }
+
+            let imageBase64 = "";
+            if (image) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imageBase64 = e.target.result;
+                    saveProductToDB(name, price, cost, quantity, category, barcode, imageBase64);
+                };
+                reader.readAsDataURL(image);
+            } else {
+                saveProductToDB(name, price, cost, quantity, category, barcode, imageBase64);
+            }
+        }
+
+        function saveProductToDB(name, price, cost, quantity, category, barcode, imageBase64) {
+            const stmt = db.prepare("INSERT INTO products (name, price, cost, quantity, category, barcode, image) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            stmt.run([name, price, cost, quantity, category, barcode, imageBase64]);
+
+            const binaryArray = new Uint8Array(db.export());
+            localStorage.setItem('db', binaryArray);
+
+            displayProducts();
+        }
+
+        function displayProducts() {
+            const productsList = db.exec("SELECT * FROM products");
+            const tableBody = document.getElementById("productTable");
+            tableBody.innerHTML = '';
+
+            productsList[0].values.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product[1]}</td>
+                    <td>${product[2]}</td>
+                    <td>${product[3]}</td>
+                    <td>${product[4]}</td>
+                    <td>${product[5]}</td>
+                    <td>${product[6]}</td>
+                    <td><img src="${product[7]}" class="product-image" alt="صورة المنتج"></td>
+                    <td>
+                        <button class="edit-button" onclick="editPrice(${index})">تعديل</button>
+                        <button class="save-button" style="display:none;" onclick="savePrice(${index})">حفظ</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function editPrice(index) {
+            const row = document.getElementById("productTable").rows[index];
+            const priceText = row.querySelector(".price-text");
+            const priceInput = row.querySelector(".price-input");
+            const editButton = row.querySelector(".edit-button");
+            const saveButton = row.querySelector(".save-button");
+
+            priceText.style.display = "none";
+            priceInput.style.display = "block";
+            editButton.style.display = "none";
+            saveButton.style.display = "inline-block";
+        }
+
+        function savePrice(index) {
+            const row = document.getElementById("productTable").rows[index];
+            const priceInput = row.querySelector(".price-input").value;
+
+            if (!priceInput || priceInput <= 0) {
+                alert("يرجى إدخال سعر صالح.");
+                return;
+            }
+
+            const stmt = db.prepare("UPDATE products SET price = ? WHERE id = ?");
+            stmt.run([priceInput, index + 1]);
+
+            const binaryArray = new Uint8Array(db.export());
+            localStorage.setItem('db', binaryArray);
+
+            displayProducts();
+        }
+
+        function scanBarcode() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    const video = document.createElement("video");
+                    video.srcObject = stream;
+                    video.play();
+
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+
+                    video.addEventListener('play', function () {
+                        setInterval(function () {
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, canvas.width, canvas.height);
+                            if (code) {
+                                alert("تم مسح الباركود: " + code.data);
+                                document.getElementById("productBarcode").value = code.data;
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                        }, 100);
+                    });
+                })
+                .catch(function (error) {
+                    alert("تعذر الوصول إلى الكاميرا: " + error);
+                });
+        }
+
+        function captureImage() {
+            const cameraInput = document.createElement('input');
+            cameraInput.type = 'file';
+            cameraInput.accept = 'image/*';
+            cameraInput.capture = 'camera';
+            cameraInput.onchange = function () {
+                const file = cameraInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById("productImage").value = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            cameraInput.click();
+        }
+    </script>
+</body>
+</html>

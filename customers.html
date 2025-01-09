@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>العملاء</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+        }
+        .app-container {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .add-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>العملاء</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم العميل</th>
+                    <th>تفاصيل العميل</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable">
+                <!-- سيتم إضافة العملاء هنا -->
+            </tbody>
+        </table>
+        <button class="add-button" onclick="window.location.href='add_customer.html'">➕ إضافة عميل جديد</button>
+    </div>
+    <script>
+        const customers = JSON.parse(localStorage.getItem("customers")) || [];
+
+        function displayCustomers() {
+            const tableBody = document.getElementById("customerTable");
+            tableBody.innerHTML = '';
+
+            customers.forEach((customer, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.name}</td>
+                    <td><button onclick="viewCustomer(${index})">عرض التفاصيل</button></td>
+                    <td><button class="delete-button" onclick="deleteCustomer(${index})">حذف</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function viewCustomer(index) {
+            localStorage.setItem("currentCustomerIndex", index);
+            window.location.href = 'customer_details.html';
+        }
+
+        function deleteCustomer(index) {
+            if (confirm("هل أنت متأكد أنك تريد حذف هذا العميل؟")) {
+                customers.splice(index, 1);
+                localStorage.setItem("customers", JSON.stringify(customers));
+                displayCustomers();
+            }
+        }
+
+        displayCustomers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الموردين</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-supplier-button {
+            background-color: #28a745;
+        }
+
+        .add-supplier-button:hover {
+            background-color: #218838;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">⬅ العودة إلى الرئيسية</button>
+
+    <div class="main-content">
+        <h1>الموردين</h1>
+
+        <button class="form-group add-supplier-button" onclick="showAddSupplierForm()">إضافة مورد جديد</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم المورد</th>
+                    <th>رقم الهاتف</th>
+                    <th>البريد الإلكتروني</th>
+                </tr>
+            </thead>
+            <tbody id="supplierTable">
+                <!-- سيتم إضافة الموردين هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- نموذج إضافة مورد جديد -->
+    <div id="addSupplierForm" style="display:none;">
+        <div class="main-content">
+            <h1>إضافة مورد جديد</h1>
+
+            <div class="form-group">
+                <label for="supplierName">اسم المورد:</label>
+                <input type="text" id="supplierName" placeholder="أدخل اسم المورد">
+            </div>
+
+            <div class="form-group">
+                <label for="supplierPhone">رقم الهاتف:</label>
+                <input type="text" id="supplierPhone" placeholder="أدخل رقم الهاتف">
+            </div>
+
+            <div class="form-group">
+                <label for="supplierEmail">البريد الإلكتروني:</label>
+                <input type="email" id="supplierEmail" placeholder="أدخل البريد الإلكتروني">
+            </div>
+
+            <div class="form-group">
+                <button onclick="addSupplier()">إضافة المورد</button>
+                <button onclick="cancelAddSupplier()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('suppliers')) {
+            const initialSuppliers = [];
+            localStorage.setItem('suppliers', JSON.stringify(initialSuppliers));
+        }
+
+        function showAddSupplierForm() {
+            document.getElementById('addSupplierForm').style.display = 'block';
+        }
+
+        function cancelAddSupplier() {
+            document.getElementById('addSupplierForm').style.display = 'none';
+        }
+
+        function addSupplier() {
+            const name = document.getElementById("supplierName").value;
+            const phone = document.getElementById("supplierPhone").value;
+            const email = document.getElementById("supplierEmail").value;
+
+            if (!name || !phone || !email) {
+                alert("من فضلك أكمل جميع الحقول.");
+                return;
+            }
+
+            const newSupplier = {
+                name,
+                phone,
+                email
+            };
+
+            const suppliersList = JSON.parse(localStorage.getItem('suppliers'));
+            suppliersList.push(newSupplier);
+            localStorage.setItem('suppliers', JSON.stringify(suppliersList));
+
+            displaySuppliers();
+            document.getElementById('supplierName').value = '';
+            document.getElementById('supplierPhone').value = '';
+            document.getElementById('supplierEmail').value = '';
+            cancelAddSupplier();
+        }
+
+        function displaySuppliers() {
+            const suppliersList = JSON.parse(localStorage.getItem('suppliers'));
+            const tableBody = document.getElementById("supplierTable");
+            tableBody.innerHTML = '';
+
+            suppliersList.forEach((supplier, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="#" onclick="viewSupplierDetails(${index})">${supplier.name}</a></td>
+                    <td>${supplier.phone}</td>
+                    <td>${supplier.email}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function viewSupplierDetails(index) {
+            const suppliersList = JSON.parse(localStorage.getItem('suppliers'));
+            const supplier = suppliersList[index];
+
+            const supplierDetails = `
+                <h1>تفاصيل المورد</h1>
+                <p><strong>اسم المورد:</strong> ${supplier.name}</p>
+                <p><strong>رقم الهاتف:</strong> ${supplier.phone}</p>
+                <p><strong>البريد الإلكتروني:</strong> ${supplier.email}</p>
+            `;
+
+            const supplierContainer = document.createElement('div');
+            supplierContainer.innerHTML = supplierDetails;
+            document.body.innerHTML = supplierContainer.innerHTML;
+        }
+
+        window.onload = displaySuppliers;
+    </script>
+</body>
+</html>
